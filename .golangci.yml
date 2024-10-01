@@ -1,0 +1,9 @@
+# Options for analysis running.
+run:
+  print-resources-usage: true
+  timeout: 30m
+
+# Use all default linters + those defined here
+linters:
+  enable:
+    - gosec

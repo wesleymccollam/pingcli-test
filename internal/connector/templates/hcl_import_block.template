@@ -1,0 +1,5 @@
+{{.CommentInformation}}
+import {
+	to = {{.ResourceType}}.{{.ResourceName}}
+	id = "{{.ResourceID}}"
+}

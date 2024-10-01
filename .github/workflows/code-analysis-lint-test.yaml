@@ -1,0 +1,157 @@
+name: Code Analysis and Tests
+
+on:
+  push:
+    branches: ["main", "go-cli"]
+  pull_request:
+    paths:
+      - ".github/workflows/*"
+      - "**.go"
+      - "go.mod"
+      - "go.sum"
+      - ".golangci.yml"
+  schedule:
+    - cron: "44 8 * * 6"
+
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+
+jobs:
+  # Ensure the project can build first
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+      - name: Get dependencies
+        run: |
+          go mod tidy
+          git diff --compact-summary --exit-code || \
+            (echo; echo "Unexpected difference after 'go mod tidy'. Run 'go mod tidy' command and commit."; exit 1)
+      - name: Build
+        run: |
+          make install
+  fmt:
+    name: go fmt
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+      - run: |
+          if [ "$(go fmt ./... | wc -l)" -gt 0 ]; then
+            echo "::error::'go fmt' found required formatting changes. Run 'make fmt' on your branch."
+            exit 1;
+          fi
+  vet:
+    name: go vet
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+      - run: make vet
+
+  golangci:
+    name: golangci-lint
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          # Require: The version of golangci-lint to use.
+          # When `install-mode` is `binary` (default) the value can be v1.2 or v1.2.3 or `latest` to use the latest version.
+          # When `install-mode` is `goinstall` the value can be v1.2.3, `latest`, or the hash of a commit.
+          version: latest
+
+          # Optional: working directory, useful for monorepos
+          # working-directory: somedir
+
+          # Optional: golangci-lint command line arguments.
+          #
+          # Note: By default, the `.golangci.yml` file should be at the root of the repository.
+          # The location of the configuration file can be changed by using `--config=`
+          # args: --timeout=30m --config=/my/path/.golangci.yml --issues-exit-code=0
+
+          # Optional: show only new issues if it's a pull request. The default value is `false`.
+          # only-new-issues: true
+
+          # Optional: if set to true, then all caching functionality will be completely disabled,
+          #           takes precedence over all other caching options.
+          skip-cache: true
+
+          # Optional: if set to true, then the action won't cache or restore ~/go/pkg.
+          # skip-pkg-cache: true
+
+          # Optional: if set to true, then the action won't cache or restore ~/.cache/go-build.
+          # skip-build-cache: true
+
+          # Optional: The mode to install golangci-lint. It can be 'binary' or 'goinstall'.
+          # install-mode: "goinstall"
+  importfmt:
+    name: importfmt
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+      - run: go install github.com/pavius/impi/cmd/impi && make importfmtlint
+  test:
+    name: go test
+    needs: [build]
+    runs-on: ubuntu-latest
+    env:
+      PING_IDENTITY_CONFIG: ${{ secrets.PING_IDENTITY_CONFIG }}
+      PINGCTL_PINGONE_WORKER_CLIENT_ID: ${{ secrets.PINGCTL_PINGONE_WORKER_CLIENT_ID }}
+      PINGCTL_PINGONE_WORKER_CLIENT_SECRET: ${{ secrets.PINGCTL_PINGONE_WORKER_CLIENT_SECRET }}
+      PINGCTL_PINGONE_REGION_CODE: ${{ secrets.PINGCTL_PINGONE_REGION_CODE }}
+      PINGCTL_PINGONE_WORKER_ENVIRONMENT_ID: ${{ secrets.PINGCTL_PINGONE_WORKER_ENVIRONMENT_ID }}
+      PINGCTL_PINGONE_EXPORT_ENVIRONMENT_ID: ${{ secrets.PINGCTL_PINGONE_EXPORT_ENVIRONMENT_ID }}
+      PINGONE_CLIENT_ID: ${{ secrets.PINGONE_CLIENT_ID }}
+      PINGONE_CLIENT_SECRET: ${{ secrets.PINGONE_CLIENT_SECRET }}
+      PINGONE_ENVIRONMENT_ID: ${{ secrets.PINGONE_ENVIRONMENT_ID }}
+      PINGONE_REGION_CODE: ${{ secrets.PINGONE_REGION_CODE }}
+      PINGCTL_LOG_LEVEL: ${{ vars.PINGCTL_LOG_LEVEL }}
+      PINGCTL_LOG_PATH: ${{ vars.PINGCTL_LOG_PATH }}
+      PINGCTL_PINGONE_PROVIDER_VERSION: ${{ vars.PINGCTL_PINGONE_PROVIDER_VERSION }}
+      PINGCTL_PINGFEDERATE_ADMIN_API_PATH: ${{ secrets.PINGCTL_PINGFEDERATE_ADMIN_API_PATH }}
+      PINGCTL_PINGFEDERATE_CLIENT_ID: ${{ secrets.PINGCTL_PINGFEDERATE_CLIENT_ID }}
+      PINGCTL_PINGFEDERATE_CLIENT_SECRET: ${{ secrets.PINGCTL_PINGFEDERATE_CLIENT_SECRET }}
+      PINGCTL_PINGFEDERATE_HTTPS_HOST: ${{ secrets.PINGCTL_PINGFEDERATE_HTTPS_HOST }}
+      PINGCTL_PINGFEDERATE_PASSWORD: ${{ secrets.PINGCTL_PINGFEDERATE_PASSWORD }}
+      PINGCTL_PINGFEDERATE_SCOPES: ${{ secrets.PINGCTL_PINGFEDERATE_SCOPES }}
+      PINGCTL_PINGFEDERATE_TOKEN_URL: ${{ secrets.PINGCTL_PINGFEDERATE_TOKEN_URL }}
+      PINGCTL_PINGFEDERATE_USERNAME: ${{ secrets.PINGCTL_PINGFEDERATE_USERNAME }}
+      PINGCTL_PINGFEDERATE_PROVIDER_VERSION: ${{ vars.PINGCTL_PINGFEDERATE_PROVIDER_VERSION }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+      - run: mkdir -p $HOME/.pingidentity/ && echo "$PING_IDENTITY_CONFIG" >> $HOME/.pingidentity/config && grep -E "[a-zA-Z]" $HOME/.pingidentity/config || exit 1 && make starttestcontainer && make test && make removetestcontainer
