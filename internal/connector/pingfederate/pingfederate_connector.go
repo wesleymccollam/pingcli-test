@@ -3,10 +3,10 @@ package pingfederate
 import (
 	"context"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/connector/pingfederate/resources"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
+	"github.com/pingidentity/pingcli/internal/logger"
 	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
@@ -49,9 +49,9 @@ func (c *PingfederateConnector) Export(format, outputDir string, overwriteExport
 		resources.AuthenticationSelector(&c.clientInfo),
 		resources.CertificateCA(&c.clientInfo),
 		resources.DataStore(&c.clientInfo),
+		resources.DefaultURLs(&c.clientInfo),
 		resources.ExtendedProperties(&c.clientInfo),
 		resources.IDPAdapter(&c.clientInfo),
-		resources.IDPDefaultURLs(&c.clientInfo),
 		resources.IDPSPConnection(&c.clientInfo),
 		resources.IncomingProxySettings(&c.clientInfo),
 		resources.KerberosRealm(&c.clientInfo),
@@ -70,7 +70,7 @@ func (c *PingfederateConnector) Export(format, outputDir string, overwriteExport
 		resources.RedirectValidation(&c.clientInfo),
 		resources.ServerSettings(&c.clientInfo),
 		resources.ServerSettingsGeneral(&c.clientInfo),
-		resources.ServerSettingsSystemKeys(&c.clientInfo),
+		resources.ServerSettingsSystemKeysRotate(&c.clientInfo),
 		resources.SessionApplicationPolicy(&c.clientInfo),
 		resources.SessionAuthenticationPoliciesGlobal(&c.clientInfo),
 		resources.SessionSettings(&c.clientInfo),
