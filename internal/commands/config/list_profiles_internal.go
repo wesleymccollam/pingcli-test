@@ -33,12 +33,9 @@ func RunInternalConfigListProfiles() {
 		}
 
 		if description != "" {
-			listStr += "    " + description + "\n"
+			listStr += "    " + description
 		}
 	}
 
-	output.Print(output.Opts{
-		Message: listStr,
-		Result:  output.ENUM_RESULT_NIL,
-	})
+	output.Message(listStr, nil)
 }
