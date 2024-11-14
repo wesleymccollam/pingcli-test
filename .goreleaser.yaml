@@ -1,3 +1,5 @@
+version: 2
+
 builds:
   # You can have multiple builds defined as a yaml list
   - #
@@ -154,3 +156,5 @@ brews:
       #
       # Templates: allowed.
       name: homebrew-tap
+
+      token: "{{ .Env.GORELEASER_HOMEBREW_TAP_GITHUB_PAT}}"
