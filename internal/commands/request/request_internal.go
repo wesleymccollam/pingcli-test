@@ -57,7 +57,7 @@ func runInternalPingOneRequest(uri string) (err error) {
 		return err
 	}
 
-	failOption, err := getFailOption()
+	failOption, err := profiles.GetOptionValue(options.RequestFailOption)
 	if err != nil {
 		return err
 	}
@@ -110,11 +110,11 @@ func runInternalPingOneRequest(uri string) (err error) {
 		// Note we don't os.Exit(1) here because pingcli has executed
 		// without issue, despite a failed response to the custom request
 		output.UserError("Failed Custom Request", fields)
+		if failOption == "true" {
+			return fmt.Errorf("custom request failed with --fail (-f) flag")
+		}
 	} else {
 		output.Success("Custom request successful", fields)
-	}
-	if failOption == "true" {
-		return fmt.Errorf("custom request failed with --fail (-f) flag")
 	}
 
 	return nil
@@ -304,12 +304,4 @@ func getData() (data string, err error) {
 	}
 
 	return data, nil
-}
-
-func getFailOption() (fail string, err error) {
-	fail, err = profiles.GetOptionValue(options.RequestFailOption)
-	if err != nil {
-		return "", err
-	}
-	return fail, nil
 }

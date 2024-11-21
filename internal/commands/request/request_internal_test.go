@@ -26,9 +26,12 @@ func Test_RunInternalRequestWithFail(t *testing.T) {
 	testutils_viper.InitVipers(t)
 	t.Setenv(options.RequestServiceOption.EnvVar, "pingone")
 	options.RequestFailOption.Flag.Changed = true
-	options.RequestFailOption.Flag.Value.Set("true")
+	err := options.RequestFailOption.Flag.Value.Set("true")
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	err := RunInternalRequest("environments/failTest")
+	err = RunInternalRequest("environments/failTest")
 	expectedErrorPattern := `^failed to send custom request: custom request failed with --fail \(-f\) flag$`
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

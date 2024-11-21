@@ -137,7 +137,7 @@ func initFailOption() {
 			Name:        cobraParamName,
 			NoOptDefVal: "true",
 			Shorthand:   "f",
-			Usage:       "Return exit code when HTTP custom request returns a failure status code.",
+			Usage:       "Return non-zero exit code when HTTP custom request returns a failure status code.",
 			Value:       cobraValue,
 		},
 
