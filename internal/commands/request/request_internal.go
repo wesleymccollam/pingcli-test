@@ -57,6 +57,11 @@ func runInternalPingOneRequest(uri string) (err error) {
 		return err
 	}
 
+	failOption, err := getFailOption()
+	if err != nil {
+		return err
+	}
+
 	apiURL := fmt.Sprintf("https://api.pingone.%s/v1/%s", topLevelDomain, uri)
 
 	httpMethod, err := profiles.GetOptionValue(options.RequestHTTPMethodOption)
@@ -107,6 +112,9 @@ func runInternalPingOneRequest(uri string) (err error) {
 		output.UserError("Failed Custom Request", fields)
 	} else {
 		output.Success("Custom request successful", fields)
+	}
+	if failOption == "true" {
+		return fmt.Errorf("custom request failed with --fail (-f) flag")
 	}
 
 	return nil
@@ -296,4 +304,12 @@ func getData() (data string, err error) {
 	}
 
 	return data, nil
+}
+
+func getFailOption() (fail string, err error) {
+	fail, err = profiles.GetOptionValue(options.RequestFailOption)
+	if err != nil {
+		return "", err
+	}
+	return fail, nil
 }
