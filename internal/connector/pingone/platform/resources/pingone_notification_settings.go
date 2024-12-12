@@ -22,41 +22,48 @@ func NotificationSettings(clientInfo *connector.PingOneClientInfo) *PingOneNotif
 	}
 }
 
+func (r *PingOneNotificationSettingsResource) ResourceType() string {
+	return "pingone_notification_settings"
+}
+
 func (r *PingOneNotificationSettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsSettingsApi.ReadNotificationsSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadNotificationsSettings", r.ResourceType())
+	err := r.checkNotificationSettingsData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	if response.StatusCode == 204 {
-		l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
-		return &importBlocks, nil
-	}
-
 	commentData := map[string]string{
-		"Resource Type":         r.ResourceType(),
 		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Resource Type":         r.ResourceType(),
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       "notification_settings",
+		ResourceName:       r.ResourceType(),
 		ResourceID:         r.clientInfo.ExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneNotificationSettingsResource) ResourceType() string {
-	return "pingone_notification_settings"
+func (r *PingOneNotificationSettingsResource) checkNotificationSettingsData() error {
+	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsSettingsApi.ReadNotificationsSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	err = common.HandleClientResponse(response, err, "ReadNotificationsSettings", r.ResourceType())
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode == 204 {
+		return common.DataNilError(r.ResourceType(), response)
+	}
+
+	return nil
 }

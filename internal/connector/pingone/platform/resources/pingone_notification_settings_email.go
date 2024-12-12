@@ -22,61 +22,48 @@ func NotificationSettingsEmail(clientInfo *connector.PingOneClientInfo) *PingOne
 	}
 }
 
+func (r *PingOneNotificationSettingsEmailResource) ResourceType() string {
+	return "pingone_notification_settings_email"
+}
+
 func (r *PingOneNotificationSettingsEmailResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	emailNotificationSettings, response, err := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsSettingsSMTPApi.ReadEmailNotificationsSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadEmailNotificationsSettings", r.ResourceType())
+	err := r.checkNotificationSettingsEmailData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	if emailNotificationSettings == nil {
-		l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
-		return &importBlocks, nil
-	}
-
-	if response.StatusCode == 204 {
-		l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
-		return &importBlocks, nil
-	}
-
-	emailNotificationSettingsEnv, emailNotificationSettingsEnvOk := emailNotificationSettings.GetEnvironmentOk()
-	var (
-		emailNotificationSettingsEnvID   *string
-		emailNotificationSettingsEnvIDOk bool
-	)
-
-	if emailNotificationSettingsEnvOk {
-		emailNotificationSettingsEnvID, emailNotificationSettingsEnvIDOk = emailNotificationSettingsEnv.GetIdOk()
-	}
-
-	if !emailNotificationSettingsEnvOk || !emailNotificationSettingsEnvIDOk || emailNotificationSettingsEnvID == nil {
-		l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
-		return &importBlocks, nil
-	}
-
 	commentData := map[string]string{
-		"Resource Type":         r.ResourceType(),
 		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Resource Type":         r.ResourceType(),
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       "pingone_notification_settings_email",
+		ResourceName:       r.ResourceType(),
 		ResourceID:         r.clientInfo.ExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneNotificationSettingsEmailResource) ResourceType() string {
-	return "pingone_notification_settings_email"
+func (r *PingOneNotificationSettingsEmailResource) checkNotificationSettingsEmailData() error {
+	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsSettingsSMTPApi.ReadEmailNotificationsSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	err = common.HandleClientResponse(response, err, "ReadEmailNotificationsSettings", r.ResourceType())
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode == 204 {
+		return common.DataNilError(r.ResourceType(), response)
+	}
+
+	return nil
 }

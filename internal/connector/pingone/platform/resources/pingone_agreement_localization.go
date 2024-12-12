@@ -24,68 +24,114 @@ func AgreementLocalization(clientInfo *connector.PingOneClientInfo) *PingOneAgre
 	}
 }
 
+func (r *PingOneAgreementLocalizationResource) ResourceType() string {
+	return "pingone_agreement_localization"
+}
+
 func (r *PingOneAgreementLocalizationResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllAgreements"
-
-	agreementEmbedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	agreementData, err := r.getAgreementData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	for agreementId, agreementName := range *agreementData {
+		agreementLanguageData, err := r.getAgreementLanguageData(agreementId)
+		if err != nil {
+			return nil, err
+		}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, agreement := range agreementEmbedded.GetAgreements() {
-		agreementId, agreementIdOk := agreement.GetIdOk()
-		agreementName, agreementNameOk := agreement.GetNameOk()
-
-		if agreementIdOk && agreementNameOk {
-			apiExecuteFunc = r.clientInfo.ApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.ReadAllAgreementLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *agreement.Id).Execute
-			apiFunctionName = "ReadAllAgreementLanguages"
-
-			agreementLanguageEmbedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
-			if err != nil {
-				return nil, err
+		for agreementLanguageId, agreementLanguageLocale := range *agreementLanguageData {
+			commentData := map[string]string{
+				"Agreement ID":              agreementId,
+				"Agreement Language ID":     agreementLanguageId,
+				"Agreement Language Locale": agreementLanguageLocale,
+				"Agreement Name":            agreementName,
+				"Export Environment ID":     r.clientInfo.ExportEnvironmentID,
+				"Resource Type":             r.ResourceType(),
 			}
 
-			for _, languageWrapper := range agreementLanguageEmbedded.GetLanguages() {
-				if languageWrapper.AgreementLanguage != nil {
-					agreementLanguage := languageWrapper.AgreementLanguage
-
-					agreementLanguageLocale, agreementLanguageLocaleOk := agreementLanguage.GetLocaleOk()
-					agreementLanguageId, agreementLanguageIdOk := agreementLanguage.GetIdOk()
-
-					if agreementLanguageLocaleOk && agreementLanguageIdOk {
-						commentData := map[string]string{
-							"Resource Type":             r.ResourceType(),
-							"Agreement Name":            *agreementName,
-							"Agreement Language Locale": *agreementLanguageLocale,
-							"Export Environment ID":     r.clientInfo.ExportEnvironmentID,
-							"Agreement ID":              *agreementId,
-							"Agreement Language ID":     *agreementLanguageId,
-						}
-
-						importBlocks = append(importBlocks, connector.ImportBlock{
-							ResourceType:       r.ResourceType(),
-							ResourceName:       fmt.Sprintf("%s_%s", *agreementName, *agreementLanguageLocale),
-							ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, *agreementId, *agreementLanguageId),
-							CommentInformation: common.GenerateCommentInformation(commentData),
-						})
-					}
-				}
+			importBlock := connector.ImportBlock{
+				ResourceType:       r.ResourceType(),
+				ResourceName:       fmt.Sprintf("%s_%s", agreementName, agreementLanguageLocale),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, agreementId, agreementLanguageId),
+				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
+
+			importBlocks = append(importBlocks, importBlock)
 		}
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneAgreementLocalizationResource) ResourceType() string {
-	return "pingone_agreement_localization"
+func (r *PingOneAgreementLocalizationResource) getAgreementData() (*map[string]string, error) {
+	agreementData := make(map[string]string)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+
+	for cursor, err := range iter {
+		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllAgreements", r.ResourceType())
+		if err != nil {
+			return nil, err
+		}
+
+		if cursor.EntityArray == nil {
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		for _, agreement := range embedded.GetAgreements() {
+			agreementId, agreementIdOk := agreement.GetIdOk()
+			agreementName, agreementNameOk := agreement.GetNameOk()
+
+			if agreementIdOk && agreementNameOk {
+				agreementData[*agreementId] = *agreementName
+			}
+		}
+	}
+
+	return &agreementData, nil
+}
+
+func (r *PingOneAgreementLocalizationResource) getAgreementLanguageData(agreementId string) (*map[string]string, error) {
+	agreementLanguageData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.ReadAllAgreementLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, agreementId).Execute()
+
+	for cursor, err := range iter {
+		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllAgreementLanguages", r.ResourceType())
+		if err != nil {
+			return nil, err
+		}
+
+		if cursor.EntityArray == nil {
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		for _, languageInner := range embedded.GetLanguages() {
+			if languageInner.AgreementLanguage != nil {
+				agreementLanguageId, agreementLanguageIdOk := languageInner.AgreementLanguage.GetIdOk()
+				agreementLanguageLocale, agreementLanguageLocaleOk := languageInner.AgreementLanguage.GetLocaleOk()
+
+				if agreementLanguageIdOk && agreementLanguageLocaleOk {
+					agreementLanguageData[*agreementLanguageId] = *agreementLanguageLocale
+				}
+			}
+		}
+	}
+
+	return &agreementLanguageData, nil
 }

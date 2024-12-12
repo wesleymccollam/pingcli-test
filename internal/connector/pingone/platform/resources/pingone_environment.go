@@ -22,30 +22,45 @@ func Environment(clientInfo *connector.PingOneClientInfo) *PingOneEnvironmentRes
 	}
 }
 
+func (r *PingOneEnvironmentResource) ResourceType() string {
+	return "pingone_environment"
+}
+
 func (r *PingOneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
-
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+	err := r.checkEnvironmentData()
+	if err != nil {
+		return nil, err
+	}
 
 	commentData := map[string]string{
 		"Resource Type":         r.ResourceType(),
 		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       "export_environment",
+		ResourceName:       r.ResourceType(),
 		ResourceID:         r.clientInfo.ExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneEnvironmentResource) ResourceType() string {
-	return "pingone_environment"
+func (r *PingOneEnvironmentResource) checkEnvironmentData() error {
+	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+
+	err = common.HandleClientResponse(response, err, "ReadOneEnvironment", r.ResourceType())
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
