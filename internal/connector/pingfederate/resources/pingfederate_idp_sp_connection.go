@@ -1,8 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -24,61 +22,67 @@ func IDPSPConnection(clientInfo *connector.PingFederateClientInfo) *PingFederate
 	}
 }
 
+func (r *PingFederateIDPSPConnectionResource) ResourceType() string {
+	return "pingfederate_idp_sp_connection"
+}
+
 func (r *PingFederateIDPSPConnectionResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.IdpSpConnectionsAPI.GetSpConnections(r.clientInfo.Context).Execute
-	apiFunctionName := "GetSpConnections"
+	spConnectionData, err := r.getSpConnectionData()
+	if err != nil {
+		return nil, err
+	}
 
-	spConnections, response, err := apiExecuteFunc()
+	for spConnectionId, spConnectionName := range *spConnectionData {
+		commentData := map[string]string{
+			"IDP SP Connection Resource ID":   spConnectionId,
+			"IDP SP Connection Resource Name": spConnectionName,
+			"Resource Type":                   r.ResourceType(),
+		}
 
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       spConnectionName,
+			ResourceID:         spConnectionId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
+}
+
+func (r *PingFederateIDPSPConnectionResource) getSpConnectionData() (*map[string]string, error) {
+	spConnectionData := make(map[string]string)
+
+	spConnections, response, err := r.clientInfo.ApiClient.IdpSpConnectionsAPI.GetSpConnections(r.clientInfo.Context).Execute()
+	err = common.HandleClientResponse(response, err, "GetSpConnections", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
 	if spConnections == nil {
-		l.Error().Msgf("Returned %s() spConnections is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	spConnectionsItems, ok := spConnections.GetItemsOk()
-	if !ok {
-		l.Error().Msgf("Failed to get %s() spConnections items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	spConnectionsItems, spConnectionsItemsOk := spConnections.GetItemsOk()
+	if !spConnectionsItemsOk {
+		return nil, common.DataNilError(r.ResourceType(), response)
 	}
-
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	for _, spConnection := range spConnectionsItems {
 		spConnectionId, spConnectionIdOk := spConnection.GetIdOk()
 		spConnectionName, spConnectionNameOk := spConnection.GetNameOk()
 
 		if spConnectionIdOk && spConnectionNameOk {
-			commentData := map[string]string{
-				"Resource Type":                   r.ResourceType(),
-				"IDP SP Connection Resource ID":   *spConnectionId,
-				"IDP SP Connection Resource Name": *spConnectionName,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *spConnectionName,
-				ResourceID:         *spConnectionId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			spConnectionData[*spConnectionId] = *spConnectionName
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingFederateIDPSPConnectionResource) ResourceType() string {
-	return "pingfederate_idp_sp_connection"
+	return &spConnectionData, nil
 }
