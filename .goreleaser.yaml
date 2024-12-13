@@ -19,7 +19,7 @@ builds:
     # Default: '-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser'.
     # Templates: allowed.
     ldflags:
-      - '-s -w -X main.version={{.Version}} -X main.commit={{.Commit}}'
+      - "-s -w -X main.version={{.Version}} -X main.commit={{.Commit}}"
 
     # GOOS list to build for.
     # For more info refer to: https://golang.org/doc/install/source#environment
@@ -96,8 +96,7 @@ checksum:
   disable: false
 
 brews:
-  -
-    # Git author used to commit to the repository.
+  - # Git author used to commit to the repository.
     commit_author:
       name: goreleaserbot
       email: bot@goreleaser.com
@@ -158,3 +157,7 @@ brews:
       name: homebrew-tap
 
       token: "{{ .Env.GORELEASER_HOMEBREW_TAP_GITHUB_PAT}}"
+
+dockers:
+  - id: pingcli
+    dockerfile: Dockerfile
