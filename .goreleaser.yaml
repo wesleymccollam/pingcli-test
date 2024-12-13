@@ -100,3 +100,5 @@ dockers:
     dockerfile: Dockerfile
     image_templates:
       - "wesleymccollam/pingcli:latest"
+      - "wesleymccollam/pingcli:{{ .Version }}"
+    skip_push: true
