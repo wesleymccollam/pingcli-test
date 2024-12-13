@@ -144,20 +144,6 @@ brews:
     #   system "#{bin}/foo --version"
     #   # ...
 
-    # Repository to push the generated files to.
-    repository:
-      # Repository owner.
-      #
-      # Templates: allowed.
-      owner: pingidentity
-
-      # Repository name.
-      #
-      # Templates: allowed.
-      name: homebrew-tap
-
-      token: "{{ .Env.GORELEASER_HOMEBREW_TAP_GITHUB_PAT}}"
-
 dockers:
   - id: pingcli
     dockerfile: Dockerfile
