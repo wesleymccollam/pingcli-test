@@ -29,3 +29,10 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  dockerhub:
+    runs-on: ubuntu-latest
+    username: ${{ secrets.USERNAME }}
+    secret_name: ${{ secrets.DOCKER_TOKEN }}
+    images:
+      - "wesleymccollam/pingcli:latest"
+      - "wesleymccollam/pingcli:{{ .Version }}"
