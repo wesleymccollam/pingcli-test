@@ -166,8 +166,28 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateKeypairsSigningKeyRotationSettings",
+			resource:      resources.KeypairsSigningKeyRotationSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateKeypairsSslServerSettings",
+			resource:      resources.KeypairsSslServerSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateLocalIdentityProfile",
 			resource:      resources.LocalIdentityProfile(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateMetadataUrl",
+			resource:      resources.MetadataUrl(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateNotificationPublisher",
+			resource:      resources.NotificationPublisher(PingFederateClientInfo),
 			ignoredErrors: nil,
 		},
 		{
@@ -181,8 +201,23 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateOAuthAccessTokenManagerSettings",
+			resource:      resources.OAuthAccessTokenManagerSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateOAuthAccessTokenMapping",
 			resource:      resources.OAuthAccessTokenMapping(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateOAuthAuthenticationPolicyContractMapping",
+			resource:      resources.OAuthAuthenticationPolicyContractMapping(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateOAuthCibaServerPolicyRequestPolicy",
+			resource:      resources.OAuthCibaServerPolicyRequestPolicy(PingFederateClientInfo),
 			ignoredErrors: nil,
 		},
 		{
@@ -196,6 +231,21 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateOAuthClientRegistrationPolicy",
+			resource:      resources.OAuthClientRegistrationPolicy(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateOAuthClientSettings",
+			resource:      resources.OAuthClientSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateOAuthIdpAdapterMapping",
+			resource:      resources.OAuthIdpAdapterMapping(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateOAuthIssuer",
 			resource:      resources.OAuthIssuer(PingFederateClientInfo),
 			ignoredErrors: nil,
@@ -203,6 +253,16 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 		{
 			name:          "PingFederateOAuthServerSettings",
 			resource:      resources.OAuthServerSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateOAuthTokenExchangeGeneratorSettings",
+			resource:      resources.OAuthTokenExchangeGeneratorSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateOAuthTokenExchangeTokenGeneratorMapping",
+			resource:      resources.OAuthTokenExchangeTokenGeneratorMapping(PingFederateClientInfo),
 			ignoredErrors: nil,
 		},
 		{
@@ -226,16 +286,29 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateProtocolMetadataLifetimeSettings",
+			resource:      resources.ProtocolMetadataLifetimeSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateProtocolMetadataSigningSettings",
+			resource:      resources.ProtocolMetadataSigningSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateRedirectValidation",
 			resource:      resources.RedirectValidation(PingFederateClientInfo),
 			ignoredErrors: nil,
 		},
 		{
-			name:     "PingFederateServerSettings",
-			resource: resources.ServerSettings(PingFederateClientInfo),
-			ignoredErrors: []string{
-				"Error: Invalid Attribute Value Length",
-			},
+			name:          "PingFederateSecretManager",
+			resource:      resources.SecretManager(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateServerSettings",
+			resource:      resources.ServerSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
 		},
 		{
 			name:          "PingFederateServerSettingsGeneral",
@@ -243,8 +316,30 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateServerSettingsLogging",
+			resource:      resources.ServerSettingsLogging(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateServerSettingsSystemKeysRotate",
 			resource:      resources.ServerSettingsSystemKeysRotate(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateServerSettingsWsTrustStsSettings",
+			resource:      resources.ServerSettingsWsTrustStsSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:     "PingFederateServerSettingsWsTrustStsSettingsIssuerCertificate",
+			resource: resources.ServerSettingsWsTrustStsSettingsIssuerCertificate(PingFederateClientInfo),
+			ignoredErrors: []string{
+				"Error: Missing Configuration for Required Attribute",
+			},
+		},
+		{
+			name:          "PingFederateServiceAuthentication",
+			resource:      resources.ServiceAuthentication(PingFederateClientInfo),
 			ignoredErrors: nil,
 		},
 		{
@@ -258,13 +353,40 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateSessionAuthenticationPolicy",
+			resource:      resources.SessionAuthenticationPolicy(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateSessionSettings",
 			resource:      resources.SessionSettings(PingFederateClientInfo),
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateSpAdapter",
+			resource:      resources.SpAdapter(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateSPAuthenticationPolicyContractMapping",
 			resource:      resources.SPAuthenticationPolicyContractMapping(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:     "PingFederateSpIdpConnection",
+			resource: resources.SpIdpConnection(PingFederateClientInfo),
+			ignoredErrors: []string{
+				"Error: Invalid Object Attribute Type",
+			},
+		},
+		{
+			name:          "PingFederateSpTargetUrlMappings",
+			resource:      resources.SpTargetUrlMappings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateTokenProcessorToTokenGeneratorMapping",
+			resource:      resources.TokenProcessorToTokenGeneratorMapping(PingFederateClientInfo),
 			ignoredErrors: nil,
 		},
 		{
