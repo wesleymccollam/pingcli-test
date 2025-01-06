@@ -94,16 +94,3 @@ checksum:
 
   # Disable the generation/upload of the checksum file.
   disable: false
-
-dockers:
-  - image_templates:
-      - "wesleymccollam/pingcli:{{ .Version }}-arm64"
-    use: buildx
-    goos: linux
-    goarch: arm64
-    build_flag_templates:
-      - "--platform=linux/arm64"
-docker_manifests:
-  - name_template: "wesleymccollam/pingcli:{{ .Version }}"
-    image_templates:
-      - "wesleymccollam/pingcli:{{ .Version }}-arm64"
