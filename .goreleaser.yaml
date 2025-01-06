@@ -97,21 +97,13 @@ checksum:
 
 dockers:
   - image_templates:
-      - "wesleymccollam/pingcli:{{ .Version }}-amd64"
-    use: buildx
-    goos: linux
-    goarch: amd64
-    build_flag_templates:
-      - "--platform=linux/amd64"
-  - image_templates:
-      - "wesleymccollam/pingcli:{{ .Version }}-arm64v8"
+      - "wesleymccollam/pingcli:{{ .Version }}-arm64"
     use: buildx
     goos: linux
     goarch: arm64
     build_flag_templates:
-      - "--platform=linux/arm64/v8"
+      - "--platform=linux/arm64"
 docker_manifests:
   - name_template: "wesleymccollam/pingcli:{{ .Version }}"
     image_templates:
-      - "wesleymccollam/pingcli:{{ .Version }}-amd64"
-      - "wesleymccollam/pingcli:{{ .Version }}-arm64v8"
+      - "wesleymccollam/pingcli:{{ .Version }}-arm64"
