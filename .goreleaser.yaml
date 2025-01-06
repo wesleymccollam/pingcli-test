@@ -128,7 +128,7 @@ docker_manifests:
     #  indicator of a prerelease in the tag, e.g. v1.0.0-rc1.
     #
     # Templates: allowed.
-    skip_push: false
+    skip_push: auto
 
     # Set the "backend" for the Docker manifest pipe.
     # Valid options are: docker, podman
