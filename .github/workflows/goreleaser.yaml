@@ -24,8 +24,8 @@ jobs:
         with:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
-      - name: Setup qemu
-        uses: docker/setup-qemu-action
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
