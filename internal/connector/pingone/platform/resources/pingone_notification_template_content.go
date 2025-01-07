@@ -185,10 +185,6 @@ func (r *PingOneNotificationTemplateContentResource) getTemplateContentData(temp
 			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
-		if templateName == management.ENUMTEMPLATENAME_STRONG_AUTHENTICATION {
-			fmt.Printf("Page data length %d\n", len(embedded.GetContents()))
-		}
-
 		for _, templateContent := range embedded.GetContents() {
 			var (
 				templateContentId               *string
@@ -222,7 +218,7 @@ func (r *PingOneNotificationTemplateContentResource) getTemplateContentData(temp
 				templateContentLocale, templateContentLocaleOk = templateContent.TemplateContentVoice.GetLocaleOk()
 				templateContentVariant = templateContent.TemplateContentVoice.GetVariant()
 			default:
-				l.Warn().Msgf("Template content '%s' for template '%s' is not one of: Push, SMS, Email, or Voice. Skipping export.", *templateContentId, templateName)
+				l.Warn().Msgf("Template content '%v' for template '%s' is not one of: Push, SMS, Email, or Voice. Skipping export.", templateContent, templateName)
 				continue
 			}
 
