@@ -107,6 +107,7 @@ dockers:
       - &arm64_image "wesleymccollam/pingcli:{{ .Version }}-arm64v8"
     use: buildx
     dockerfile: Dockerfile
+    goarm: "8"
     build_flag_templates:
       - "--platform=linux/arm64"
 docker_manifests:
