@@ -1,6 +1,11 @@
 package options
 
-import "github.com/spf13/pflag"
+import (
+	"slices"
+	"strings"
+
+	"github.com/spf13/pflag"
+)
 
 type OptionType string
 
@@ -27,12 +32,13 @@ type Option struct {
 	DefaultValue    pflag.Value
 	EnvVar          string
 	Flag            *pflag.Flag
+	Sensitive       bool
 	Type            OptionType
 	ViperKey        string
 }
 
 func Options() []Option {
-	return []Option{
+	optList := []Option{
 		PingOneAuthenticationTypeOption,
 		PingOneAuthenticationWorkerClientIDOption,
 		PingOneAuthenticationWorkerClientSecretOption,
@@ -79,6 +85,13 @@ func Options() []Option {
 		RequestAccessTokenExpiryOption,
 		RequestFailOption,
 	}
+
+	// Sort the options list by viper key
+	slices.SortFunc(optList, func(opt1, opt2 Option) int {
+		return strings.Compare(opt1.ViperKey, opt2.ViperKey)
+	})
+
+	return optList
 }
 
 // pingone service options

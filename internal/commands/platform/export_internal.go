@@ -335,19 +335,8 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 
 	pingoneApiClient, err = apiConfig.APIClient(ctx)
 	if err != nil {
-		return fmt.Errorf(`failed to initialize pingone API client.
-%v
-
-configuration values used for client initialization:
-worker client ID - %s
-worker client secret - %s
-worker environment ID - %s
-pingone region - %s`,
-			err,
-			pingoneApiClientId,
-			strings.Repeat("*", len(clientSecret)),
-			environmentID,
-			regionCode)
+		return fmt.Errorf("failed to initialize pingone API client. Check worker client ID, worker client secret,"+
+			" worker environment ID, and pingone region code configuration values. %v", err)
 	}
 
 	return nil
