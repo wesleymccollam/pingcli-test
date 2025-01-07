@@ -1,5 +1,8 @@
 version: 2
 
+env:
+  - RELEASE_VERSION={{ .Tag }}
+
 builds:
   # You can have multiple builds defined as a yaml list
   - #
