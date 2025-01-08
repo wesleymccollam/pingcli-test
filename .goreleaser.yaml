@@ -95,14 +95,14 @@ dockers:
     dockerfile: Dockerfile
     goarch: amd64
     build_flag_templates:
-      - "--platform=linux/amd64 --build-arg RELEASE_VERSION={{ .Version }}"
+      - '--platform="linux/arm64" --build-arg RELEASE_VERSION={{ .Version }}'
   - image_templates:
       - &arm64_image "wesleymccollam/pingcli:{{ .Version }}-arm64v8"
     use: buildx
     dockerfile: Dockerfile
     goarm: "8"
     build_flag_templates:
-      - "--platform=linux/arm64 --build-arg RELEASE_VERSION={{ .Version }}"
+      - '--platform="linux/arm64" --build-arg RELEASE_VERSION={{ .Version }}'
 docker_manifests:
   - id: pingcli
   - name_template: "wesleymccollam/pingcli:latest"
