@@ -5,6 +5,8 @@ ENV RELEASE_VERSION=$RELEASE_VERSION
 # Set the working directory
 WORKDIR /app
 
+RUN env | sort
+
 # Download the source code from GitHub Releases
 RUN curl -L https://github.com/pingidentity/pingcli/archive/refs/tags/${RELEASE_VERSION}tar.gz | tar xz --strip-components=1
 
