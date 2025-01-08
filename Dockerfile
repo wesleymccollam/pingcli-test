@@ -1,11 +1,9 @@
 # Use the official Go image as the base for building
 FROM golang:1.23 as builder
-ENV RELEASE_VERSION=$RELEASE_VERSION
+ARG RELEASE_VERSION
 
 # Set the working directory
 WORKDIR /app
-
-RUN env | sort
 
 # Download the source code from GitHub Releases
 RUN curl -L https://github.com/pingidentity/pingcli/archive/refs/tags/${RELEASE_VERSION}tar.gz | tar xz --strip-components=1
