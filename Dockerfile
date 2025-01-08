@@ -6,7 +6,7 @@ ARG RELEASE_VERSION
 WORKDIR /app
 
 # Download the source code from GitHub Releases
-RUN curl -L https://github.com/pingidentity/pingcli/archive/refs/tags/v${RELEASE_VERSION}tar.gz | tar xz --strip-components=1
+RUN curl -L https://github.com/pingidentity/pingcli/archive/refs/tags/v${RELEASE_VERSION}.tar.gz | tar xz --strip-components=1
 
 # Build the pingcli binary (ensure static build)
 RUN CGO_ENABLED=0 go mod tidy && CGO_ENABLED=0 go build -o /pingcli
