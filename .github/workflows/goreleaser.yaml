@@ -34,6 +34,5 @@ jobs:
           # 'latest', 'nightly', or a semver
           version: "~> v2"
           args: release --clean
-          env: RELEASE_VERSION=${{ github.ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
