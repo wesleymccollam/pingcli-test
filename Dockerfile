@@ -4,6 +4,9 @@ FROM golang:1.23 as builder
 # Set the working directory
 WORKDIR /app
 
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY . .
 
 # Build the pingcli binary (ensure static build)
