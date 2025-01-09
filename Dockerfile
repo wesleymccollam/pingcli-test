@@ -2,7 +2,7 @@
 FROM alpine:latest
 
 # Copy the binary from the builder stage
-COPY  pingcli /usr/local/bin/pingcli
+COPY /pingcli /usr/local/bin/pingcli
 
 # Set permissions for the binary
 RUN chmod +x /usr/local/bin/pingcli
