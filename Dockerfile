@@ -4,6 +4,9 @@ FROM scratch
 # Copy content into working directory
 COPY ./ /pingcli
 
+# Set permissions for the binary
+RUN chmod +x /pingcli
+
 # Set the entry point
 ENTRYPOINT ["/pingcli"]
 
