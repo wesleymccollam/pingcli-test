@@ -1,14 +1,20 @@
-# Use the official Go image as the base for building
-FROM scratch
+# Use Alpine as the runtime image
+FROM alpine:latest
 
-# Copy content into working directory
-COPY ./ /pingcli
+# Make pingcli dir
+RUN mkdir -p /usr/local/bin/pingcli
+
+# Copy the binary from the builder stage
+COPY ./ /usr/local/bin/pingcli
 
 # Set permissions for the binary
-RUN chmod +x /pingcli
+RUN chmod +x /usr/local/bin/pingcli
+
+# Debugging step: Verify binary is in place
+RUN ls -al /usr/local/bin/pingcli/
 
 # Set the entry point
-ENTRYPOINT ["/pingcli"]
+ENTRYPOINT ["pingcli"]
 
 # Allow subcommands
 CMD []
