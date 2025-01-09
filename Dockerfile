@@ -1,9 +1,8 @@
-# Use Alpine as the runtime image
+# Start from an empty scratch image
 FROM scratch
 
-# Set the entry point
-ENTRYPOINT ["pingcli"]
-COPY pingcli /
+# Copy the statically compiled Go binary into the container
+COPY pingcli /pingcli
 
-# Allow subcommands
-CMD []
+# Set the binary as the entry point
+ENTRYPOINT ["/pingcli"]
