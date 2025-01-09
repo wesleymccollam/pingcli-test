@@ -4,8 +4,6 @@ FROM golang:1.23 as builder
 # Set the working directory
 WORKDIR /app
 
-RUN mkdir pingcli
-
 COPY . .
 
 # Build the pingcli binary (ensure static build)
