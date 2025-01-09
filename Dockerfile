@@ -6,7 +6,7 @@ WORKDIR /app
 
 RUN mkdir pingcli
 
-COPY ./ ./
+COPY . .
 
 # Build the pingcli binary (ensure static build)
 RUN CGO_ENABLED=0 go mod tidy && CGO_ENABLED=0 go build -o /pingcli
