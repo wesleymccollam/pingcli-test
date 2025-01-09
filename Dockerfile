@@ -1,5 +1,5 @@
 # Start from an empty scratch image
-FROM scratch
+FROM alpine:latest
 
 # Copy the statically compiled Go binary into the container
 COPY pingcli /pingcli
