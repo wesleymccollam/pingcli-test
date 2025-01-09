@@ -1,14 +1,12 @@
 # Use the official Go image as the base for building
 FROM golang:1.23 as builder
 
-# GitHub tag
-ARG RELEASE_VERSION
-
 # Set the working directory
 WORKDIR /app
 
-# Download the source code from GitHub Releases
-COPY ./ /app/
+RUN mkdir pingcli
+
+COPY ./ ./
 
 # Build the pingcli binary (ensure static build)
 RUN CGO_ENABLED=0 go mod tidy && CGO_ENABLED=0 go build -o /pingcli
