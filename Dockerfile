@@ -1,10 +1,11 @@
 # Use the official Go image as the base for building
 FROM golang:1.23 as builder
 
+# Copy content into working directory
+COPY ./ /app
+
 # Set the working directory
 WORKDIR /app
-
-COPY . /app
 
 # Build the pingcli binary (ensure static build)
 RUN CGO_ENABLED=0 go mod tidy && CGO_ENABLED=0 go build -o /pingcli
