@@ -1,6 +1,8 @@
 version: 2
 
 builds:
+  - env:
+      - CGO_ENABLED=0
   # You can have multiple builds defined as a yaml list
   - #
     # ID of the build.
