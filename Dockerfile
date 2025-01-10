@@ -1,6 +1,10 @@
 # Use Alpine as the runtime image
 FROM alpine:latest
 
+RUN mkdir /tmp/build/
+# Add context to /tmp/build/
+COPY . /tmp/build/
+
 # Install glibc
 RUN apk update && apk add --no-cache gcompat libstdc++
 
