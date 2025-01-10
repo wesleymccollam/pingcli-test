@@ -90,26 +90,25 @@ checksum:
 
 dockers:
   - image_templates:
-      - &amd64_image "wesleymccollam/pingcli:{{ .Version }}-amd64"
+      - "wesleymccollam/pingcli:{{ .Tag }}-amd64"
     use: buildx
-    dockerfile: Dockerfile
     goarch: amd64
     build_flag_templates:
       - "--platform=linux/amd64"
+      - "--pull"
   - image_templates:
-      - &arm64_image "wesleymccollam/pingcli:{{ .Version }}-arm64v8"
+      - "wesleymccollam/pingcli:{{ .Tag }}-arm64"
     use: buildx
-    dockerfile: Dockerfile
-    goarm: "8"
+    goarch: arm64
     build_flag_templates:
       - "--platform=linux/arm64"
+      - "--pull"
 docker_manifests:
-  - id: pingcli
   - name_template: "wesleymccollam/pingcli:latest"
     image_templates:
-      - *amd64_image
-      - *arm64_image
-  - name_template: "wesleymccollam/pingcli:{{ .Version }}"
+      - "wesleymccollam/pingcli:{{ .Tag }}-amd64"
+      - "wesleymccollam/pingcli:{{ .Tag }}-arm64"
+  - name_template: "wesleymccollam/pingcli:{{ .Tag }}"
     image_templates:
-      - *amd64_image
-      - *arm64_image
+      - "wesleymccollam/pingcli:{{ .Tag }}-amd64"
+      - "wesleymccollam/pingcli:{{ .Tag }}-arm64"
