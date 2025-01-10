@@ -1,8 +1,6 @@
 version: 2
 
 builds:
-  - env:
-      - CGO_ENABLED=0
   # You can have multiple builds defined as a yaml list
   - #
     # ID of the build.
@@ -15,6 +13,15 @@ builds:
     #
     # Default: Project directory name
     binary: pingcli
+
+    # Custom environment variables to be set during the builds.
+    # Invalid environment variables will be ignored.
+    # For more info refer to: https://pkg.go.dev/cmd/go#hdr-Environment_variables
+    #
+    # Default: os.Environ() ++ env config section.
+    # Templates: allowed.
+    env:
+      - CGO_ENABLED=0
 
     # GOOS list to build for.
     # For more info refer to: https://golang.org/doc/install/source#environment
