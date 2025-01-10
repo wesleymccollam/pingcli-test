@@ -4,10 +4,8 @@ FROM alpine:latest
 # Install glibc
 RUN apk update && apk add --no-cache gcompat libstdc++
 
-RUN mkdir -p /usr/local/bin/pingcli
-
 # Copy in repo
-COPY ./ /usr/local/bin/pingcli
+COPY pingcli /usr/local/bin/
 
 # Set permissions for the binary
 RUN chmod +x /usr/local/bin/pingcli
