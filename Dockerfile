@@ -1,6 +1,9 @@
 # Use Alpine as the runtime image
 FROM alpine:latest
 
+# Copy in repo
+COPY pingcli ./
+
 # Install glibc
 RUN apk update && apk add --no-cache gcompat libstdc++
 
