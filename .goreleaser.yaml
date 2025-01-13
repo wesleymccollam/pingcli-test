@@ -3,7 +3,7 @@ version: 2
 archives:
   - # Builds reference which build instances should be archived in this archive.
     builds:
-      - default
+      - pingcli
 
     # Archive format.
     #
