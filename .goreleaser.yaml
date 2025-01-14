@@ -169,6 +169,11 @@ winget:
     # Default: inferred from global metadata.
     license: "Apache"
 
+    # Path for the file inside the repository.
+    #
+    # Default: 'manifests/<lowercased first char of publisher>/<publisher>/<name>/<version>'.
+    path: windows_manifests/{{ .Tag }}
+
     # Publisher URL.
     #
     # Templates: allowed.
