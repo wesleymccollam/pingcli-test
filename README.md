@@ -8,11 +8,13 @@ The Ping CLI is a unified command line interface for configuring and managing Pi
 
 Use the [Ping CLI Docker image](https://hub.docker.com/r/pingidentity/pingcli)
 
-```text
 Pull Image:
+```shell
 docker pull pingidentity/pingcli:latest
+```
 
 Example Commands:
+```shell
 docker run <Image ID> <sub commands>
 
 docker run <Image ID> --version
@@ -22,11 +24,11 @@ docker run <Image ID> --version
 
 Use PingIdentity's Homebrew tap to install Ping CLI
 
-```text
+```shell
 brew install pingidentity/tap/pingcli
-
+```
 or
-
+``` shell
 brew tap pingidentity/tap
 brew install pingcli
 ```
@@ -39,7 +41,7 @@ OR
 
 Use the following single-line command to install Ping CLI into '/usr/local/bin' directly.
 
-```text
+```shell
 RELEASE_VERSION=$(basename $(curl -Ls -o /dev/null -w %{url_effective} https://github.com/pingidentity/pingcli/releases/latest)); \
 OS_NAME=$(uname -s); \
 HARDWARE_PLATFORM=$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/); \
@@ -55,17 +57,16 @@ See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases
 
 OR
 
-Use the following single-line powershell command to install Ping CLI into '%LOCALAPPDATA%\Programs' directly.
-```text
+Use the following single-line PowerShell 7.4 command to install Ping CLI into '%LOCALAPPDATA%\Programs' directly.
+```powershell
 $latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing -SkipHttpErrorCheck; `
 $RELEASE_VERSION = [System.IO.Path]::GetFileName($latestReleaseUrl.Headers.Location); `
 $RELEASE_VERSION_NO_PREFIX = $RELEASE_VERSION -replace "^v", ""; `
-$uname = (uname -m); `
-$HARDWARE_PLATFORM = $uname -replace "aarch64", "arm64" -replace "x86_64", "amd64"; `
+$HARDWARE_PLATFORM = $env:PROCESSOR_ARCHITECTURE -replace "ARM64", "arm64" -replace "x86", "386" -replace "AMD64", "amd64" -replace "EM64T", "amd64"; `
 $URL = "https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION_NO_PREFIX}_windows_${HARDWARE_PLATFORM}.tar.gz"
-Invoke-WebRequest -Uri $URL -OutFile pingcli.tar.gz; `
-tar -zxf pingcli.tar.gz -C "${env:LOCALAPPDATA}\Programs" pingcli.exe; `
-Remove-Item pingcli.tar.gz
+Invoke-WebRequest -Uri $URL -OutFile "pingcli.tar.gz"; `
+tar -zxf "pingcli.tar.gz" -C "${env:LOCALAPPDATA}\Programs" pingcli.exe; `
+Remove-Item "pingcli.tar.gz"
 ```
 
 ## Configure Ping CLI
