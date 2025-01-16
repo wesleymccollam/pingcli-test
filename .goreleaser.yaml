@@ -92,7 +92,7 @@ nfpms:
     # GoReleaser will automatically add the binaries.
     contents:
       # Basic file that applies to all packagers
-      - src: ./
+      - src: /
         dst: /usr/bin/pingcli
 
     # Custom configuration applied only to the RPM packager.
