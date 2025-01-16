@@ -1,30 +1,5 @@
 version: 2
 
-archives:
-  - # Builds reference which build instances should be archived in this archive.
-    builds:
-      - pingcli
-
-    # Archive format.
-    #
-    # If format is `binary`, no archives are created and the binaries are instead
-    # uploaded directly.
-    #
-    # Valid options are:
-    # - `tar.gz`
-    # - `tgz`
-    # - `tar.xz`
-    # - `txz`
-    # - `tar.zst`
-    # - `tzst` # Since: v2.1.
-    # - `tar`
-    # - `gz`
-    # - `zip`
-    # - `binary`
-    #
-    # Default: 'tar.gz'.
-    format: zip
-
 builds:
   # You can have multiple builds defined as a yaml list
   - #
@@ -67,6 +42,128 @@ builds:
       - "386"
       - amd64
       - arm64
+
+nfpms:
+  # note that this is an array of nfpm configs
+  - #
+    # ID of the nfpm config, must be unique.
+    #
+    # Default: 'default'.
+    id: pingcli
+
+    # Name of the package.
+    #
+    # Default: ProjectName.
+    # Templates: allowed.
+    package_name: pingcli
+
+    # Your app's vendor.
+    vendor: Ping Identity
+
+    # Your app's homepage.
+    #
+    # Default: inferred from global metadata.
+    homepage: https://github.com/wesleymccollam/pingcli-test
+
+    # Your app's maintainer (probably you).
+    #
+    # Default: inferred from global metadata.
+    maintainer: Ping Identity
+
+    # Your app's description.
+    #
+    # Default: inferred from global metadata.
+    description: "The Ping CLI is a unified command line interface for configuring and managing Ping Identity Services."
+
+    # Your app's license.
+    #
+    # Default: inferred from global metadata.
+    license: Apache 2.0
+
+    # Formats to be generated.
+    formats:
+      - apk
+      - deb
+      - rpm
+      - termux.deb
+      - archlinux
+
+    # Contents to add to the package.
+    # GoReleaser will automatically add the binaries.
+    contents:
+      # Basic file that applies to all packagers
+      - src: ./
+        dst: /usr/bin/pingcli
+
+    # Custom configuration applied only to the RPM packager.
+    rpm:
+      # The package summary.
+      #
+      # Default: first line of the description.
+      summary: The Ping CLI is a unified command line interface for configuring and managing Ping Identity Services.
+
+      # The packager is used to identify the organization that actually packaged
+      # the software, as opposed to the author of the software.
+      # `maintainer` will be used as fallback if not specified.
+      # This will expand any env var you set in the field, eg packager: ${PACKAGER}
+      packager: Ping Identity
+
+      # The package is signed if a key_file is set
+      signature:
+        # PGP secret key file path (can also be ASCII-armored).
+        #
+        # See "Signing key passphrases" below for more information.
+        #
+        # Templates: allowed.
+        key_file: "{{ .Env.GPG_KEY_PATH }}"
+
+    # Custom configuration applied only to the Deb packager.
+    deb:
+      # The package is signed if a key_file is set
+      signature:
+        # PGP secret key file path (can also be ASCII-armored).
+        #
+        # See "Signing key passphrases" below for more information.
+        #
+        # Templates: allowed.
+        key_file: "{{ .Env.GPG_KEY_PATH }}"
+
+        # The type describes the signers role, possible values are "origin",
+        # "maint" and "archive".
+        #
+        # Default: 'origin'.
+        type: origin
+
+      # Additional fields for the control file. Empty fields are ignored.
+      # This will expand any env vars you set in the field values, e.g. Vcs-Browser: ${CI_PROJECT_URL}
+      fields:
+        Bugs: https://github.com/wesleymccollam/pingcli-test/issues
+
+    apk:
+      # The package is signed if a key_file is set
+      signature:
+        # PGP secret key file path (can also be ASCII-armored).
+        #
+        # See "Signing key passphrases" below for more information.
+        #
+        # Templates: allowed.
+        key_file: "{{ .Env.GPG_KEY_PATH }}"
+
+        # The name of the signing key. When verifying a package, the signature
+        # is matched to the public key store in /etc/apk/keys/<key_name>.rsa.pub.
+        #
+        # Default: maintainer's email address.
+        # Templates: allowed.
+        key_name: origin
+
+    archlinux:
+      # The pkgbase can be used to explicitly specify the name to be used to refer
+      # to a group of packages. See: https://wiki.archlinux.org/title/PKGBUILD#pkgbase.
+      pkgbase: pingcli
+
+      # The packager refers to the organization packaging the software, not to be confused
+      # with the maintainer, which is the person who maintains the software.
+      packager: Ping Identity
 
 release:
   # If set to auto, will mark the release as not ready for production
@@ -147,127 +244,3 @@ docker_manifests:
     image_templates:
       - "wesleymccollam/pingcli:{{ .Tag }}-amd64"
       - "wesleymccollam/pingcli:{{ .Tag }}-arm64"
-
-winget:
-  - # Publisher name.
-    #
-    # Templates: allowed.
-    # Required
-    publisher: pingcli-test
-
-    # Your app's description.
-    #
-    # Templates: allowed.
-    # Required
-    # Default: inferred from global metadata.
-    short_description: "The Ping CLI is a unified command line interface."
-
-    # License name.
-    #
-    # Templates: allowed.
-    # Required
-    # Default: inferred from global metadata.
-    license: "Apache"
-
-    # Path for the file inside the repository.
-    #
-    # Default: 'manifests/<lowercased first char of publisher>/<publisher>/<name>/<version>'.
-    path: windows_manifests/{{ .Tag }}
-
-    # Publisher URL.
-    #
-    # Templates: allowed.
-    publisher_url: https://pingidentity.com
-
-    # Publisher support URL.
-    #
-    # Templates: allowed.
-    publisher_support_url: "https://github.com/wesleymccollam/pingcli-test/issues/new"
-
-    # GOAMD64 to specify which amd64 version to use if there are multiple
-    # versions from the build section.
-    #
-    # Default: 'v1'.
-    goamd64: v1
-
-    # Git author used to commit to the repository.
-    commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
-
-    # The project name and current git tag are used in the format string.
-    #
-    # Templates: allowed.
-    commit_msg_template: "{{ .PackageIdentifier }}: {{ .Tag }}"
-
-    # Your app's homepage.
-    #
-    # Default: inferred from global metadata.
-    homepage: "https://github.com/wesleymccollam/pingcli-test"
-
-    # Your app's long description.
-    #
-    # Templates: allowed.
-    # Default: inferred from global metadata.
-    description: "The Ping CLI is a unified command line interface for configuring and managing Ping Identity Services."
-
-    # License URL.
-    #
-    # Templates: allowed.
-    license_url: "http://www.apache.org/licenses/"
-
-    # Copyright.
-    #
-    # Templates: allowed.
-    copyright: "Ping Identity Corporation"
-
-    # Copyright URL.
-    #
-    # Templates: allowed.
-    copyright_url: "https://support.pingidentity.com/s/article/Copyright-and-Trademarks"
-
-    # Setting this will prevent goreleaser to actually try to commit the updated
-    # package - instead, it will be stored on the dist directory only,
-    # leaving the responsibility of publishing it to the user.
-    #
-    # If set to auto, the release will not be uploaded to the repository
-    # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
-    #
-    # Templates: allowed.
-    skip_upload: false
-
-    # Release notes.
-    #
-    # If you want to use the release notes generated by GoReleaser, use
-    # `{{.Changelog}}` as the value.
-    #
-    # Templates: allowed.
-    release_notes: "{{.Changelog}}"
-
-    # Release notes URL.
-    #
-    # Templates: allowed.
-    release_notes_url: "https://github.com/wesleymccollam"
-
-    # Tags.
-    tags:
-      - golang
-      - cli
-
-    # Repository to push the generated files to.
-    repository:
-      # Repository owner.
-      #
-      # Templates: allowed.
-      owner: wesleymccollam
-
-      # Repository name.
-      #
-      # Templates: allowed.
-      name: pingcli-test
-
-      # Optionally a branch can be provided.
-      #
-      # Default: default repository branch.
-      # Templates: allowed.
-      branch: main
