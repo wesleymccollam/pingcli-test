@@ -85,8 +85,6 @@ nfpms:
       - apk
       - deb
       - rpm
-      - termux.deb
-      - archlinux
 
     # Custom configuration applied only to the RPM packager.
     rpm:
@@ -206,3 +204,33 @@ docker_manifests:
     image_templates:
       - "wesleymccollam/pingcli:{{ .Tag }}-amd64"
       - "wesleymccollam/pingcli:{{ .Tag }}-arm64"
+
+signs:
+  - #
+    # ID of the sign config, must be unique.
+    #
+    # Default: 'default'.
+    id: pingcli
+
+    # Which artifacts to sign
+    #
+    # Valid options are:
+    # - none        no signing
+    # - all:        all artifacts
+    # - checksum:   checksum files
+    # - source:     source archive
+    # - package:    Linux packages (deb, rpm, apk, etc)
+    # - installer:  Windows MSI installers (Pro only)
+    # - diskimage:  macOS DMG disk images (Pro only)
+    # - archive:    archives from archive pipe
+    # - sbom:       any SBOMs generated for other artifacts
+    # - binary:     binaries (only when `archives.format` is 'binary', use binaries_sign otherwise)
+    #
+    # Default: 'none'.
+    artifacts: all
+
+    # IDs of the artifacts to sign.
+    #
+    # If `artifacts` is checksum or source, this fields has no effect.
+    ids:
+      - pingcli
