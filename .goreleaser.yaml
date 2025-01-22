@@ -1,5 +1,9 @@
 version: 2
 
+# Publish the binaries directly, without any archiving
+archives:
+  - format: "binary"
+
 builds:
   # You can have multiple builds defined as a yaml list
   - #
@@ -116,15 +120,6 @@ nfpms:
         # Templates: allowed.
         key_name: origin
 
-    archlinux:
-      # The pkgbase can be used to explicitly specify the name to be used to refer
-      # to a group of packages. See: https://wiki.archlinux.org/title/PKGBUILD#pkgbase.
-      pkgbase: pingcli
-
-      # The packager refers to the organization packaging the software, not to be confused
-      # with the maintainer, which is the person who maintains the software.
-      packager: Ping Identity
-
 release:
   # If set to auto, will mark the release as not ready for production
   # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
@@ -227,7 +222,7 @@ signs:
     # - binary:     binaries (only when `archives.format` is 'binary', use binaries_sign otherwise)
     #
     # Default: 'none'.
-    artifacts: all
+    artifacts: checksum
 
     # IDs of the artifacts to sign.
     #
