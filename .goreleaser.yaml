@@ -2,7 +2,7 @@ version: 2
 
 # Publish the binaries directly, without any archiving
 archives:
-  - format: "binary"
+  - formats: ["binary"]
 
 builds:
   # You can have multiple builds defined as a yaml list
@@ -170,7 +170,7 @@ checksum:
   algorithm: sha256
 
   # If true, will create one checksum file for each artifact.
-  split: true
+  split: false
 
   # Disable the generation/upload of the checksum file.
   disable: false
@@ -205,7 +205,7 @@ signs:
     # ID of the sign config, must be unique.
     #
     # Default: 'default'.
-    id: pingcli
+    id: "checksum"
 
     # Which artifacts to sign
     #
@@ -222,10 +222,48 @@ signs:
     # - binary:     binaries (only when `archives.format` is 'binary', use binaries_sign otherwise)
     #
     # Default: 'none'.
-    artifacts: checksum
-
-    # IDs of the artifacts to sign.
+    artifacts: "checksum"
+  - #
+    # ID of the sign config, must be unique.
     #
-    # If `artifacts` is checksum or source, this fields has no effect.
-    ids:
-      - pingcli
+    # Default: 'default'.
+    id: "binary"
+
+    # Which artifacts to sign
+    #
+    # Valid options are:
+    # - none        no signing
+    # - all:        all artifacts
+    # - checksum:   checksum files
+    # - source:     source archive
+    # - package:    Linux packages (deb, rpm, apk, etc)
+    # - installer:  Windows MSI installers (Pro only)
+    # - diskimage:  macOS DMG disk images (Pro only)
+    # - archive:    archives from archive pipe
+    # - sbom:       any SBOMs generated for other artifacts
+    # - binary:     binaries (only when `archives.format` is 'binary', use binaries_sign otherwise)
+    #
+    # Default: 'none'.
+    artifacts: "binary"
+  - #
+    # ID of the sign config, must be unique.
+    #
+    # Default: 'default'.
+    id: "package"
+
+    # Which artifacts to sign
+    #
+    # Valid options are:
+    # - none        no signing
+    # - all:        all artifacts
+    # - checksum:   checksum files
+    # - source:     source archive
+    # - package:    Linux packages (deb, rpm, apk, etc)
+    # - installer:  Windows MSI installers (Pro only)
+    # - diskimage:  macOS DMG disk images (Pro only)
+    # - archive:    archives from archive pipe
+    # - sbom:       any SBOMs generated for other artifacts
+    # - binary:     binaries (only when `archives.format` is 'binary', use binaries_sign otherwise)
+    #
+    # Default: 'none'.
+    artifacts: "package"
