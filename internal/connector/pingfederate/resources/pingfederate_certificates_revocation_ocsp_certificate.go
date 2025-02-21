@@ -39,7 +39,7 @@ func (r *PingFederateCertificatesRevocationOCSPCertificateResource) ExportAll() 
 		return nil, err
 	}
 
-	for ocspCertificateId, ocspCertificateInfo := range *ocspCertificateData {
+	for ocspCertificateId, ocspCertificateInfo := range ocspCertificateData {
 		ocspCertificateIssuerDN := ocspCertificateInfo[0]
 		ocspCertificateSerialNumber := ocspCertificateInfo[1]
 
@@ -63,13 +63,16 @@ func (r *PingFederateCertificatesRevocationOCSPCertificateResource) ExportAll() 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateCertificatesRevocationOCSPCertificateResource) getOcspCertificateData() (*map[string][]string, error) {
+func (r *PingFederateCertificatesRevocationOCSPCertificateResource) getOcspCertificateData() (map[string][]string, error) {
 	ocspCertificateData := make(map[string][]string)
 
 	ocspCertificates, response, err := r.clientInfo.ApiClient.CertificatesRevocationAPI.GetOcspCertificates(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetOcspCertificates", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetOcspCertificates", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if ocspCertificates == nil {
@@ -91,5 +94,5 @@ func (r *PingFederateCertificatesRevocationOCSPCertificateResource) getOcspCerti
 		}
 	}
 
-	return &ocspCertificateData, nil
+	return ocspCertificateData, nil
 }

@@ -39,7 +39,7 @@ func (r *PingFederateOAuthIdpAdapterMappingResource) ExportAll() (*[]connector.I
 		return nil, err
 	}
 
-	for _, idpAdapterMappingId := range *idpAdapterMappingData {
+	for _, idpAdapterMappingId := range idpAdapterMappingData {
 		commentData := map[string]string{
 			"OAuth IDP Adapter Mapping ID": idpAdapterMappingId,
 			"Resource Type":                r.ResourceType(),
@@ -58,13 +58,16 @@ func (r *PingFederateOAuthIdpAdapterMappingResource) ExportAll() (*[]connector.I
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOAuthIdpAdapterMappingResource) getIdpAdapterMappingData() (*[]string, error) {
+func (r *PingFederateOAuthIdpAdapterMappingResource) getIdpAdapterMappingData() ([]string, error) {
 	idpAdapterMappingData := []string{}
 
 	idpAdapterMappings, response, err := r.clientInfo.ApiClient.OauthIdpAdapterMappingsAPI.GetIdpAdapterMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetIdpAdapterMappings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetIdpAdapterMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if idpAdapterMappings == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateOAuthIdpAdapterMappingResource) getIdpAdapterMappingData() 
 		}
 	}
 
-	return &idpAdapterMappingData, nil
+	return idpAdapterMappingData, nil
 }

@@ -39,7 +39,7 @@ func (r *PingFederateOAuthAuthenticationPolicyContractMappingResource) ExportAll
 		return nil, err
 	}
 
-	for _, mappingId := range *apcToPersistentGrantMappingData {
+	for _, mappingId := range apcToPersistentGrantMappingData {
 		commentData := map[string]string{
 			"Authentication Policy Contract Mapping ID": mappingId,
 			"Resource Type": r.ResourceType(),
@@ -58,13 +58,16 @@ func (r *PingFederateOAuthAuthenticationPolicyContractMappingResource) ExportAll
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOAuthAuthenticationPolicyContractMappingResource) getApcToPersistentGrantMappingData() (*[]string, error) {
+func (r *PingFederateOAuthAuthenticationPolicyContractMappingResource) getApcToPersistentGrantMappingData() ([]string, error) {
 	apcToPersistentGrantMappingData := []string{}
 
 	apcToPersistentGrantMappings, response, err := r.clientInfo.ApiClient.OauthAuthenticationPolicyContractMappingsAPI.GetApcMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetApcMappings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetApcMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apcToPersistentGrantMappings == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateOAuthAuthenticationPolicyContractMappingResource) getApcToP
 		}
 	}
 
-	return &apcToPersistentGrantMappingData, nil
+	return apcToPersistentGrantMappingData, nil
 }

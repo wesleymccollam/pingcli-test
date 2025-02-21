@@ -39,7 +39,7 @@ func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) ExportAll() (*[
 		return nil, err
 	}
 
-	for signingKeyPairId, signingKeyPairInfo := range *signingKeyPairData {
+	for signingKeyPairId, signingKeyPairInfo := range signingKeyPairData {
 		signingKeyPairIssuerDN := signingKeyPairInfo[0]
 		signingKeyPairSerialNumber := signingKeyPairInfo[1]
 
@@ -63,13 +63,16 @@ func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) ExportAll() (*[
 	return &importBlocks, nil
 }
 
-func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) getSigningKeyPairData() (*map[string][]string, error) {
+func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) getSigningKeyPairData() (map[string][]string, error) {
 	signingKeyPairData := make(map[string][]string)
 
 	signingKeyPairs, response, err := r.clientInfo.ApiClient.KeyPairsSigningAPI.GetSigningKeyPairs(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetSigningKeyPairs", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetSigningKeyPairs", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if signingKeyPairs == nil {
@@ -95,5 +98,5 @@ func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) getSigningKeyPa
 		}
 	}
 
-	return &signingKeyPairData, nil
+	return signingKeyPairData, nil
 }

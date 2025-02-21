@@ -39,7 +39,7 @@ func (r *PingFederateOAuthAccessTokenMappingResource) ExportAll() (*[]connector.
 		return nil, err
 	}
 
-	for mappingId, mappingContextType := range *mappingData {
+	for mappingId, mappingContextType := range mappingData {
 		commentData := map[string]string{
 			"OAuth Access Token Mapping ID":           mappingId,
 			"OAuth Access Token Mapping Context Type": mappingContextType,
@@ -59,13 +59,16 @@ func (r *PingFederateOAuthAccessTokenMappingResource) ExportAll() (*[]connector.
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOAuthAccessTokenMappingResource) getMappingData() (*map[string]string, error) {
+func (r *PingFederateOAuthAccessTokenMappingResource) getMappingData() (map[string]string, error) {
 	mappingData := make(map[string]string)
 
 	mappings, response, err := r.clientInfo.ApiClient.OauthAccessTokenMappingsAPI.GetMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetMappings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	for _, mapping := range mappings {
@@ -81,5 +84,5 @@ func (r *PingFederateOAuthAccessTokenMappingResource) getMappingData() (*map[str
 		}
 	}
 
-	return &mappingData, nil
+	return mappingData, nil
 }

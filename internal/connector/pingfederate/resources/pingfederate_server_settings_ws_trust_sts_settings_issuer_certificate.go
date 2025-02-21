@@ -39,7 +39,7 @@ func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) 
 		return nil, err
 	}
 
-	for issuerCertId, issuerCertInfo := range *issuerCertsData {
+	for issuerCertId, issuerCertInfo := range issuerCertsData {
 		issuerCertDN := issuerCertInfo[0]
 		issuerCertSerialNumber := issuerCertInfo[1]
 
@@ -63,13 +63,16 @@ func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) getIssuerCertsData() (*map[string][]string, error) {
+func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) getIssuerCertsData() (map[string][]string, error) {
 	issuerCertsData := make(map[string][]string)
 
 	issuerCerts, response, err := r.clientInfo.ApiClient.ServerSettingsAPI.GetCerts(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetCerts", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetCerts", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if issuerCerts == nil {
@@ -95,5 +98,5 @@ func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) 
 		}
 	}
 
-	return &issuerCertsData, nil
+	return issuerCertsData, nil
 }

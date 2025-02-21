@@ -212,6 +212,13 @@ func initPingFederateServices(ctx context.Context, pingcliVersion string) (err e
 		return fmt.Errorf("failed to initialize PingFederate services. unrecognized authentication type '%s'", authType)
 	}
 
+	// Test PF API client with create Context Auth
+	_, response, err := pingfederateApiClient.VersionAPI.GetVersion(pingfederateContext).Execute()
+	ok, err := common.HandleClientResponse(response, err, "GetVersion", "pingfederate_client_init")
+	if err != nil || !ok {
+		return fmt.Errorf("failed to initialize PingFederate Go Client. Check authentication type and credentials")
+	}
+
 	return nil
 }
 
@@ -347,8 +354,8 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolved
 
 	// Check if outputDir is empty
 	if outputDir == "" {
-		return "", fmt.Errorf("Failed to export services. The output directory is not set. Specify the output directory "+
-			"via the '--%s' flag, '%s' environment variable, or key '%s' in the configuration file.",
+		return "", fmt.Errorf("failed to export services. The output directory is not set. Specify the output directory "+
+			"via the '--%s' flag, '%s' environment variable, or key '%s' in the configuration file",
 			options.PlatformExportOutputDirectoryOption.CobraParamName,
 			options.PlatformExportOutputDirectoryOption.EnvVar,
 			options.PlatformExportOutputDirectoryOption.ViperKey)
@@ -430,9 +437,12 @@ func validatePingOneExportEnvID(ctx context.Context) (err error) {
 	}
 
 	environment, response, err := pingoneApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(ctx, pingoneExportEnvID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadOneEnvironment", "pingone_environment")
+	ok, err := common.HandleClientResponse(response, err, "ReadOneEnvironment", "pingone_environment")
 	if err != nil {
 		return err
+	}
+	if !ok {
+		return fmt.Errorf("failed to validate pingone environment ID '%s'", pingoneExportEnvID)
 	}
 
 	if environment == nil {

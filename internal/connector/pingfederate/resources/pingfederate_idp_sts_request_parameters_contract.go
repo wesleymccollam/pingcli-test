@@ -37,7 +37,7 @@ func (r *PingFederateIdpStsRequestParametersContractResource) ExportAll() (*[]co
 		return nil, err
 	}
 
-	for stsRequestParamContractId, stsRequestParamContractName := range *stsRequestParamContractData {
+	for stsRequestParamContractId, stsRequestParamContractName := range stsRequestParamContractData {
 		commentData := map[string]string{
 			"IDP STS Request Parameters Contract ID":   stsRequestParamContractId,
 			"IDP STS Request Parameters Contract Name": stsRequestParamContractName,
@@ -57,13 +57,16 @@ func (r *PingFederateIdpStsRequestParametersContractResource) ExportAll() (*[]co
 	return &importBlocks, nil
 }
 
-func (r *PingFederateIdpStsRequestParametersContractResource) getStsRequestParamContractData() (*map[string]string, error) {
+func (r *PingFederateIdpStsRequestParametersContractResource) getStsRequestParamContractData() (map[string]string, error) {
 	stsRequestParamContractData := make(map[string]string)
 
 	stsRequestParamContracts, response, err := r.clientInfo.ApiClient.IdpStsRequestParametersContractsAPI.GetStsRequestParamContracts(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetStsRequestParamContracts", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetStsRequestParamContracts", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if stsRequestParamContracts == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateIdpStsRequestParametersContractResource) getStsRequestParam
 		}
 	}
 
-	return &stsRequestParamContractData, nil
+	return stsRequestParamContractData, nil
 }

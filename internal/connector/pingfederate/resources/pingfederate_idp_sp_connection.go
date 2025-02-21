@@ -37,7 +37,7 @@ func (r *PingFederateIDPSPConnectionResource) ExportAll() (*[]connector.ImportBl
 		return nil, err
 	}
 
-	for spConnectionId, spConnectionName := range *spConnectionData {
+	for spConnectionId, spConnectionName := range spConnectionData {
 		commentData := map[string]string{
 			"IDP SP Connection ID":   spConnectionId,
 			"IDP SP Connection Name": spConnectionName,
@@ -57,13 +57,16 @@ func (r *PingFederateIDPSPConnectionResource) ExportAll() (*[]connector.ImportBl
 	return &importBlocks, nil
 }
 
-func (r *PingFederateIDPSPConnectionResource) getSpConnectionData() (*map[string]string, error) {
+func (r *PingFederateIDPSPConnectionResource) getSpConnectionData() (map[string]string, error) {
 	spConnectionData := make(map[string]string)
 
 	spConnections, response, err := r.clientInfo.ApiClient.IdpSpConnectionsAPI.GetSpConnections(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetSpConnections", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetSpConnections", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if spConnections == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateIDPSPConnectionResource) getSpConnectionData() (*map[string
 		}
 	}
 
-	return &spConnectionData, nil
+	return spConnectionData, nil
 }

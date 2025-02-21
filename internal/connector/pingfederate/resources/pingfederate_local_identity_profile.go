@@ -37,7 +37,7 @@ func (r *PingFederateLocalIdentityProfileResource) ExportAll() (*[]connector.Imp
 		return nil, err
 	}
 
-	for identityProfileId, identityProfileName := range *identityProfileData {
+	for identityProfileId, identityProfileName := range identityProfileData {
 		commentData := map[string]string{
 			"Local Identity Profile ID":   identityProfileId,
 			"Local Identity Profile Name": identityProfileName,
@@ -57,13 +57,16 @@ func (r *PingFederateLocalIdentityProfileResource) ExportAll() (*[]connector.Imp
 	return &importBlocks, nil
 }
 
-func (r *PingFederateLocalIdentityProfileResource) getIdentityProfileData() (*map[string]string, error) {
+func (r *PingFederateLocalIdentityProfileResource) getIdentityProfileData() (map[string]string, error) {
 	identityProfileData := make(map[string]string)
 
 	identityProfiles, response, err := r.clientInfo.ApiClient.LocalIdentityIdentityProfilesAPI.GetIdentityProfiles(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetIdentityProfiles", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetIdentityProfiles", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if identityProfiles == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateLocalIdentityProfileResource) getIdentityProfileData() (*ma
 		}
 	}
 
-	return &identityProfileData, nil
+	return identityProfileData, nil
 }
