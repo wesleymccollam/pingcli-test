@@ -130,4 +130,5 @@ func (r *PingOneApplicationSecretResource) checkApplicationSecretData(appId stri
 	}
 
 	return true, nil
+
 }
