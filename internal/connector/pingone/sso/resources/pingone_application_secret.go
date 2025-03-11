@@ -117,15 +117,6 @@ func (r *PingOneApplicationSecretResource) checkApplicationSecretData(appId stri
 	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationSecretApi.ReadApplicationSecret(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
 	defer response.Body.Close()
 
-	// If the appId is the same as the worker ID, make sure the API response is a 403 and ignore the error
-	if appId == *r.clientInfo.ApiClientId {
-		if response.StatusCode == 403 {
-			return false, nil
-		} else {
-			return false, fmt.Errorf("error: Expected 403 Forbidden response - worker apps cannot read their own secret\n%s Response Code: %s\nResponse Body: %s", "ReadApplicationSecret", response.Status, response.Body)
-		}
-	}
-
 	// Use output package to warn the user of any errors or non-200 response codes
 	// Expected behavior in this case is to skip the resource, and continue exporting the other resources
 	if err != nil || response.StatusCode >= 300 || response.StatusCode < 200 {
