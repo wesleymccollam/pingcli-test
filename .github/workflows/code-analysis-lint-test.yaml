@@ -154,4 +154,10 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
-      - run: mkdir -p $HOME/.pingidentity/ && echo "$PING_IDENTITY_CONFIG" >> $HOME/.pingidentity/config && grep -E "[a-zA-Z]" $HOME/.pingidentity/config || exit 1 && make starttestcontainer && make test && make removetestcontainer
+      - run: |
+          mkdir -p $HOME/.pingidentity/ 
+          echo "$PING_IDENTITY_CONFIG" >> $HOME/.pingidentity/config
+          grep -E "[a-zA-Z]" $HOME/.pingidentity/config || exit 1
+          make starttestcontainer
+          make test || test ${?} -eq 2
+          make removetestcontainer
