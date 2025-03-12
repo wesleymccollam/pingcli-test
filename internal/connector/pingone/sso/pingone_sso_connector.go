@@ -60,6 +60,7 @@ func (c *PingOneSSOConnector) Export(format, outputDir string, overwriteExport b
 		resources.PopulationDefaultIdp(&c.clientInfo),
 		resources.Resource(&c.clientInfo),
 		resources.ResourceAttribute(&c.clientInfo),
+		resources.ResourceSecret(&c.clientInfo),
 		resources.ResourceScope(&c.clientInfo),
 		resources.ResourceScopeOpenId(&c.clientInfo),
 		resources.ResourceScopePingOneApi(&c.clientInfo),
