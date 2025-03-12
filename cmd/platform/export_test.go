@@ -380,7 +380,7 @@ func TestPlatformExportCmd_WarnLogged(t *testing.T) {
 		t.Errorf("Platform Export WarnExitCode test failed: %s", err)
 	} else {
 		if output.WarnLogged() {
-			t.Errorf("Platform Export WarnExitCode test failed: WarnLogged() function did not return true: %t", !output.WarnLogged())
+			t.Fatalf("Platform Export WarnExitCode test failed: WarnLogged() function did not return true: %t", !output.WarnLogged())
 		}
 	}
 }
