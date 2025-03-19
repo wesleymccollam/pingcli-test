@@ -21,17 +21,17 @@ var (
 )
 
 type PingOneSSOConnector struct {
-	clientInfo connector.PingOneClientInfo
+	clientInfo connector.ClientInfo
 }
 
 // Utility method for creating a PingOneSSOConnector
 func SSOConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiClientId *string, exportEnvironmentID string) *PingOneSSOConnector {
 	return &PingOneSSOConnector{
-		clientInfo: connector.PingOneClientInfo{
-			Context:             ctx,
-			ApiClient:           apiClient,
-			ApiClientId:         apiClientId,
-			ExportEnvironmentID: exportEnvironmentID,
+		clientInfo: connector.ClientInfo{
+			PingOneContext:             ctx,
+			PingOneApiClient:           apiClient,
+			PingOneApiClientId:         *apiClientId,
+			PingOneExportEnvironmentID: exportEnvironmentID,
 		},
 	}
 }
