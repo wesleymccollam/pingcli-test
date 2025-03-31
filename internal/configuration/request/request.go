@@ -14,6 +14,7 @@ import (
 func InitRequestOptions() {
 	initDataOption()
 	initDataRawOption()
+	initHeaderOption()
 	initHTTPMethodOption()
 	initServiceOption()
 	initAccessTokenOption()
@@ -63,6 +64,31 @@ func initDataRawOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
+		ViperKey:  "", // No viper key
+	}
+}
+
+func initHeaderOption() {
+	cobraParamName := "header"
+	cobraValue := new(customtypes.HeaderSlice)
+	defaultValue := customtypes.HeaderSlice([]customtypes.Header{})
+
+	options.RequestHeaderOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          "", // No environment variable
+		Flag: &pflag.Flag{
+			Name:      cobraParamName,
+			Shorthand: "r",
+			Usage: fmt.Sprintf(
+				"A custom header to send in the request." +
+					"\nExample: --header \"Content-Type: application/vnd.pingidentity.user.import+json\"",
+			),
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.ENUM_HEADER,
 		ViperKey:  "", // No viper key
 	}
 }

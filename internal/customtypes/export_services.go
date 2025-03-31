@@ -35,14 +35,12 @@ func (es *ExportServices) Set(services string) error {
 	}
 
 	if services == "" || services == "[]" {
-		*es = ExportServices([]string{})
-
 		return nil
 	}
 
 	validServices := ExportServicesValidValues()
 	serviceList := strings.Split(services, ",")
-	returnServiceList := []string{}
+	returnServiceList := *es
 
 	for _, service := range serviceList {
 		if !slices.ContainsFunc(validServices, func(validService string) bool {
@@ -62,7 +60,7 @@ func (es *ExportServices) Set(services string) error {
 
 	slices.Sort(returnServiceList)
 
-	*es = ExportServices(returnServiceList)
+	*es = returnServiceList
 
 	return nil
 }

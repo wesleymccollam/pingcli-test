@@ -31,8 +31,8 @@ func TestRequestCmd_Execute(t *testing.T) {
 	os.Stdout = pipeWriter
 
 	err = testutils_cobra.ExecutePingcli(t, "request",
-		"--service", "pingone",
-		"--http-method", "GET",
+		"--"+options.RequestServiceOption.CobraParamName, "pingone",
+		"--"+options.RequestHTTPMethodOption.CobraParamName, "GET",
 		fmt.Sprintf("environments/%s/populations", os.Getenv("TEST_PINGONE_ENVIRONMENT_ID")),
 	)
 	testutils.CheckExpectedError(t, err, nil)
@@ -95,8 +95,8 @@ func TestRequestCmd_Execute_Help(t *testing.T) {
 func TestRequestCmd_Execute_InvalidService(t *testing.T) {
 	expectedErrorPattern := `^invalid argument ".*" for "-s, --service" flag: unrecognized Request Service: '.*'. Must be one of: .*$`
 	err := testutils_cobra.ExecutePingcli(t, "request",
-		"--service", "invalid-service",
-		"--http-method", "GET",
+		"--"+options.RequestServiceOption.CobraParamName, "invalid-service",
+		"--"+options.RequestHTTPMethodOption.CobraParamName, "GET",
 		fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
@@ -106,8 +106,8 @@ func TestRequestCmd_Execute_InvalidService(t *testing.T) {
 func TestRequestCmd_Execute_InvalidHTTPMethod(t *testing.T) {
 	expectedErrorPattern := `^invalid argument ".*" for "-m, --http-method" flag: unrecognized HTTP Method: '.*'. Must be one of: .*$`
 	err := testutils_cobra.ExecutePingcli(t, "request",
-		"--service", "pingone",
-		"--http-method", "INVALID",
+		"--"+options.RequestServiceOption.CobraParamName, "pingone",
+		"--"+options.RequestHTTPMethodOption.CobraParamName, "INVALID",
 		fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
@@ -117,5 +117,50 @@ func TestRequestCmd_Execute_InvalidHTTPMethod(t *testing.T) {
 func TestRequestCmd_Execute_MissingRequiredServiceFlag(t *testing.T) {
 	expectedErrorPattern := `failed to send custom request: service is required`
 	err := testutils_cobra.ExecutePingcli(t, "request", fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)))
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
+// Test Request Command with Header Flag
+func TestRequestCmd_Execute_HeaderFlag(t *testing.T) {
+	err := testutils_cobra.ExecutePingcli(t, "request",
+		"--"+options.RequestServiceOption.CobraParamName, "pingone",
+		"--"+options.RequestHTTPMethodOption.CobraParamName, "GET",
+		"--"+options.RequestHeaderOption.CobraParamName, "Content-Type: application/vnd.pingidentity.user.import+json",
+		fmt.Sprintf("environments/%s/users", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
+	)
+	testutils.CheckExpectedError(t, err, nil)
+}
+
+// Test Request Command with Header Flag with and without spacing
+func TestRequestCmd_Execute_HeaderFlagSpacing(t *testing.T) {
+	err := testutils_cobra.ExecutePingcli(t, "request",
+		"--"+options.RequestServiceOption.CobraParamName, "pingone",
+		"--"+options.RequestHTTPMethodOption.CobraParamName, "GET",
+		"--"+options.RequestHeaderOption.CobraParamName, "Test-Header:TestValue",
+		"--"+options.RequestHeaderOption.CobraParamName, "Test-Header-Two:\tTestValue",
+		fmt.Sprintf("environments/%s/users", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
+	)
+	testutils.CheckExpectedError(t, err, nil)
+}
+
+// Test Request Command with invalid Header Flag
+func TestRequestCmd_Execute_InvalidHeaderFlag(t *testing.T) {
+	expectedErrorPattern := `^invalid argument ".*" for "-r, --header" flag: failed to set Headers: Invalid header: invalid=header. Headers must be in the proper format. Expected regex pattern: .*$`
+	err := testutils_cobra.ExecutePingcli(t, "request",
+		"--"+options.RequestServiceOption.CobraParamName, "pingone",
+		"--"+options.RequestHeaderOption.CobraParamName, "invalid=header",
+		fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
+	)
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
+// Test Request Command with disallowed Authorization Header Flag
+func TestRequestCmd_Execute_DisallowedAuthorizationFlag(t *testing.T) {
+	expectedErrorPattern := `^invalid argument ".*" for "-r, --header" flag: failed to set Headers: Invalid header: Authorization. Authorization header is not allowed$`
+	err := testutils_cobra.ExecutePingcli(t, "request",
+		"--"+options.RequestServiceOption.CobraParamName, "pingone",
+		"--"+options.RequestHeaderOption.CobraParamName, "Authorization: Bearer token",
+		fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
+	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
