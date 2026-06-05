@@ -1,6 +1,7 @@
 ## Example Ping CLI configuration file
 
 ```
+configModelVersion: 2
 activeProfile: default
 default:
     noColor: true
@@ -45,5 +46,17 @@ default:
                     clientid: 12345678-1234-1234-1234-123456789012
                     clientsecret: secret
                     environmentid: 12345678-1234-1234-1234-123456789012
-            regioncode: NA
+    telemetry:
+        enabled: true
+        metric:
+            exportinterval: 1m0s
+        otlp:
+            endpoint: http://localhost:4318
+            protocol: http
+        tls:
+            cafile: /etc/ssl/certs/ca.pem
+            certfile: /etc/ssl/certs/client.pem
+            enabled: false
+            insecureskipverify: false
+            keyfile: /etc/ssl/private/client.key
 ```

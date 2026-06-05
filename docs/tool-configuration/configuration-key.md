@@ -7,9 +7,14 @@ The following parameters can be configured in Ping CLI's static configuration fi
 
 | Config File Property | Type | Equivalent Parameter | Purpose |
 |---|---|---|---|
+| configModelVersion | ENUM_INT | | The persisted configuration model version used by Ping CLI to detect and run config schema migrations.<br><br>Missing key is treated as legacy model v1.<br><br>Current model is v2. |
 | activeProfile | ENUM_STRING | | The name of the stored custom configuration profile to use by default. |
 | noColor | ENUM_BOOL | --no-color | Disable text output in color. |
 | outputFormat | ENUM_OUTPUT_FORMAT | --output-format / -O | Specify the console output format.<br><br>Options are: json, text.<br><br>Example: `json` |
+
+#### Migration Controls
+
+- Startup migration policy can be controlled by environment variable `PINGCLI_CONFIG_MIGRATION_POLICY` with values `ask`, `yes`, or `no`.
 
 #### Ping Platform Service Properties
 
@@ -36,7 +41,6 @@ The following parameters can be configured in Ping CLI's static configuration fi
 | service.pingOne.authentication.clientCredentials.environmentID | ENUM_UUID | | The ID of the PingOne environment that contains the client credentials application used to authenticate to the PingOne management API. |
 | service.pingOne.authentication.deviceCode.clientID | ENUM_STRING | | The device code client ID used to authenticate to the PingOne management API when using OAuth 2.0 device code flow. |
 | service.pingOne.authentication.deviceCode.environmentID | ENUM_UUID | | The ID of the PingOne environment that contains the device code client used to authenticate to the PingOne management API. |
-| service.pingOne.regionCode | ENUM_PINGONE_REGION_CODE | --pingone-region-code | The region code of the PingOne tenant.<br><br>Options are: AP, AU, CA, EU, NA, SG.<br><br>Example: `NA` |
 
 #### Platform Export Properties
 
@@ -55,3 +59,21 @@ The following parameters can be configured in Ping CLI's static configuration fi
 |---|---|---|---|
 | request.fail | ENUM_BOOL | --fail / -f | Return non-zero exit code when HTTP custom request returns a failure status code. |
 | request.service | ENUM_REQUEST_SERVICE | --service / -s | The Ping service (configured in the active profile) to send the custom request to.<br><br>Options are: pingone.<br><br>Example: `pingone` |
+
+#### Telemetry Properties
+
+Ping CLI can export OpenTelemetry (OTel) traces and metrics to any OTLP-compatible collector (for example, the OpenTelemetry Collector, Grafana Alloy, or a vendor-managed endpoint).
+
+Precedence for each setting: environment variable > config file value > built-in default.
+
+| Config File Property | Type | Environment Variable | Purpose |
+|---|---|---|---|
+| telemetry.enabled | ENUM_BOOL | `PINGCLI_TELEMETRY_ENABLED` | Enable or disable OTel export. Defaults to `false`. When `false` all other telemetry settings are ignored and no data is sent. |
+| telemetry.otlp.endpoint | ENUM_STRING | `OTEL_EXPORTER_OTLP_ENDPOINT` | The OTLP collector endpoint URL (e.g. `http://localhost:4318`). Required when telemetry is enabled. |
+| telemetry.otlp.protocol | ENUM_STRING | `OTEL_EXPORTER_OTLP_PROTOCOL` | The OTLP transport protocol.<br><br>Options are: `http` (HTTP/protobuf), `grpc` (gRPC).<br><br>Defaults to `http`. |
+| telemetry.tls.enabled | ENUM_BOOL | `OTEL_EXPORTER_OTLP_TLS_ENABLED` | Enable mutual TLS for OTLP connections. Defaults to `false`. |
+| telemetry.tls.certFile | ENUM_STRING | `OTEL_EXPORTER_OTLP_CERTIFICATE` | Path to the PEM-encoded client certificate file used for mTLS. |
+| telemetry.tls.keyFile | ENUM_STRING | `OTEL_EXPORTER_OTLP_CLIENT_KEY` | Path to the PEM-encoded client private key file used for mTLS. Treated as sensitive — not echoed in output. |
+| telemetry.tls.caFile | ENUM_STRING | `OTEL_EXPORTER_OTLP_CA_CERTIFICATE` | Path to a PEM-encoded CA certificate file used to verify the OTLP collector's TLS certificate. |
+| telemetry.tls.insecureSkipVerify | ENUM_BOOL | `OTEL_EXPORTER_OTLP_INSECURE` | Disable TLS certificate verification for OTLP connections. Not recommended outside of testing. Defaults to `false`. |
+| telemetry.metric.exportInterval | ENUM_DURATION | `OTEL_METRIC_EXPORT_INTERVAL` | How often metric data points are pushed to the collector.<br><br>Accepts a Go duration string (e.g. `30s`, `1m30s`).<br><br>Defaults to `1m0s` (60 seconds). |

@@ -25,7 +25,7 @@ Before authenticating to a Ping service from Ping CLI, ensure the platform is pr
 - `authorization_code` (interactive browser login)
 - `device_code` (interactive terminal login on headless environments)
 
-For guidance on which authorization flow to use see [Authorization Flow Recommendations](#auhtorization-flow-recommendations).
+For guidance on which authorization flow to use see [Authorization Flow Recommendations](#authorization-flow-recommendations).
 
 For guidance on how to configure applications in PingOne see [PingOne Platform Application documentation](https://docs.pingidentity.com/pingone/applications/p1_applications_add_applications.html)
 
@@ -115,7 +115,6 @@ pingcli login [flags]
 These settings are used by all PingOne grant types:
 
 ```bash
-pingcli config set service.pingOne.regionCode=NA
 pingcli config set service.pingOne.authentication.environmentID=<PINGONE_ENVIRONMENT_ID>
 pingcli config set service.pingOne.authentication.type=<device_code|authorization_code|client_credentials>
 ```
@@ -164,11 +163,13 @@ pingcli config set service.pingone.authentication.clientCredentials.clientSecret
 
 ### Region selection
 
-During interactive configuration Ping CLI prompts for your PingOne region and uses it to route API requests. Supported codes: `AP`, `AU`, `CA`, `EU`, `NA`, `SG`.
+Ping CLI determines the correct PingOne region from the configured root domain (e.g., `pingone.eu` for EU). Set the root domain using:
 
 ```bash
-pingcli config set service.pingOne.regionCode=<region-code>
+pingcli config set service.pingOne.endpoint.rootDomain=<root-domain>
 ```
+
+Supported root domains: `pingone.com` (NA), `pingone.eu` (EU), `pingone.asia` (AP), `pingone.com.au` (AU), `pingone.ca` (CA), `pingone.sg` (SG).
 
 ## Token Management
 
@@ -258,7 +259,7 @@ secret-tool clear service pingcli
 rm -rf ~/.pingcli/credentials
 ```
 
-## Auhtorization Flow Recommendations
+## Authorization Flow Recommendations
 
 This section provides guidance on when to select each authorization type.
 
