@@ -1,3 +1,0 @@
-```release-note:bug
-fix issue where stale tokens were not removed from keychain
-```
